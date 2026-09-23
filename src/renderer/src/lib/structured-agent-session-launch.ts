@@ -217,6 +217,7 @@ function structuredAgentLaunchState(
     return {
       state: existing,
       caller: addStructuredLaunchCaller({
+        target: existing.intent.target,
         group: existing.callers,
         launchResult: existing.promise,
         options: callerOptions,
@@ -258,6 +259,7 @@ function structuredAgentLaunchState(
         )
       : publishWithHeldOptions(state, launchAndReconcile(state))
   const caller = addStructuredLaunchCaller({
+    target: intent.target,
     group: state.callers,
     launchResult: state.promise,
     options,
