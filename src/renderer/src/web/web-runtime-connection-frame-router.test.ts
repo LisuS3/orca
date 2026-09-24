@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
   STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY,
+  CLAUDE_STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY,
   WORKTREE_GITHUB_PR_SUPPRESSION_RUNTIME_CAPABILITY
 } from '../../../shared/protocol-version'
 import { routeWebRuntimeConnectionFrame } from './web-runtime-connection-frame-router'
@@ -28,6 +29,7 @@ describe('web runtime connection capability advertisement', () => {
         type: 'e2ee_auth',
         clientCapabilities: expect.arrayContaining([
           STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY,
+          CLAUDE_STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY,
           WORKTREE_GITHUB_PR_SUPPRESSION_RUNTIME_CAPABILITY
         ])
       })
