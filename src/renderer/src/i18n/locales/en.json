@@ -17615,6 +17615,11 @@
         "blocked": "Goal blocked",
         "limited": "Goal limited",
         "attachmentsUnsupported": "Remove attachments before setting a goal."
+      },
+      "contextMenu": {
+        "orchestrationAddressCopied": "Orchestration address copied",
+        "orchestrationAddressCopyFailed": "Unable to copy orchestration address",
+        "copyOrchestrationAddress": "Copy Orchestration Address"
       }
     },
     "tab": {
