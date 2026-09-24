@@ -1,6 +1,7 @@
 import type { RuntimeTerminalSend } from '../../../../../../shared/runtime-terminal-contracts'
 import type { OrcaRuntimeService } from '../../../../orca-runtime'
 import { buildDispatchPreamble } from '../../../../orchestration/preamble'
+import { structuredSessionCliInvocation } from '../../../../orchestration/cli-command'
 import { sendStructuredWorkerPreamble } from '../../orchestration-structured-worker-session'
 import type { createStructuredWorkerSessionForWorktree } from './worker-topology'
 
@@ -37,6 +38,18 @@ export async function deliverWorkerDispatchPreamble(args: {
     taskSpec: args.taskSpec,
     coordinatorHandle: args.coordinatorHandle,
     workerHandle: terminalHandle,
+    ...(structuredSession
+      ? {
+          structuredSession: {
+            sessionId: structuredSession.identity.sessionId,
+            cliInvocation: structuredSessionCliInvocation({
+              platform: process.platform,
+              // Registered with its agent at start; null only for an entry rehydrated later.
+              provider: structuredSession.identity.agent ?? 'claude'
+            })
+          }
+        }
+      : {}),
     dispatchCapability: args.dispatchCapability,
     devMode: args.devMode,
     cliCommand: runtime.getTerminalOrchestrationCliCommand(terminalHandle)

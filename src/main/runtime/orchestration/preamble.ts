@@ -1,4 +1,4 @@
-import type { OrchestrationCliCommand } from './cli-command'
+import type { OrchestrationCliCommand, StructuredSessionCliInvocation } from './cli-command'
 
 export type PreambleParams = {
   taskId: string
@@ -10,8 +10,14 @@ export type PreambleParams = {
   dispatchId: string
   dispatchCapability?: string
   taskSpec: string
+  /** The coordinator's orchestration address: a terminal handle, or `session:<id>` for a chat. */
   coordinatorHandle: string
   workerHandle: string
+  /**
+   * Set when the worker is a structured session. Its address is then `session:<id>`, and it runs
+   * the CLI through `ORCA_CLI_COMMAND`, which names this app's CLI by absolute path.
+   */
+  structuredSession?: { sessionId: string; cliInvocation: StructuredSessionCliInvocation }
   devMode?: boolean
   // Why: packaged WSL panes install the scoped launcher as `orca-ide`;
   // other execution hosts keep their existing bare `orca` bridge.
@@ -50,7 +56,11 @@ export function buildDispatchPreamble(params: PreambleParams): string {
   // Why: in dev mode, agents must use orca-dev to connect to the dev runtime's
   // socket. Without this, agents inside the dev Electron app would call the
   // production CLI and talk to the wrong Orca instance (Section 6.4).
-  const cli = params.devMode ? 'orca-dev' : (params.cliCommand ?? 'orca')
+  const cli = params.structuredSession
+    ? params.structuredSession.cliInvocation
+    : params.devMode
+      ? 'orca-dev'
+      : (params.cliCommand ?? 'orca')
   const postDoneInstructions = buildPostWorkerDoneInstructions({
     cli,
     workerKind: params.workerKind ?? 'prompt-returning-agent'
@@ -62,9 +72,9 @@ export function buildDispatchPreamble(params: PreambleParams): string {
   // Why: one-line recipes paste unchanged in POSIX shells, PowerShell, and cmd.exe.
   // Why fenced: keeps the shell comments executable without rendering them as Chat UI headings.
   const header = `You are working inside Orca, a multi-agent IDE. You are a dispatched worker.
-Your coordinator's terminal handle is: ${params.coordinatorHandle}
+Your coordinator's address is: ${params.coordinatorHandle}
 Your task ID is: ${params.taskId}
-
+${buildWorkerAddressSection(params)}
 You talk to the coordinator only through the CLI commands below. Do not use
 Slack, GitHub comments, or any other channel to reach a human during the run.
 
@@ -140,6 +150,21 @@ ${postDoneInstructions}`
 
 === TASK ===
 ${params.taskSpec}`
+}
+
+// Why: a structured worker is a chat, reached at `session:<id>` and woken by Orca rather than a PTY.
+function buildWorkerAddressSection(params: PreambleParams): string {
+  const session = params.structuredSession
+  if (!session) {
+    return `Your orchestration address is: ${params.workerHandle}
+`
+  }
+  return `Your orchestration address is: session:${session.sessionId}
+Your coordinator reaches you there or at dispatch:${params.dispatchId}. Mail that arrives while
+you are idle starts a new turn in this chat; mid-task, read it with the check command below.
+Run every command below exactly as written: \`${session.cliInvocation}\` runs this Orca's CLI
+from ORCA_CLI_COMMAND, and a bare \`orca\` in a login shell can reach a different Orca.
+`
 }
 
 function buildPostWorkerDoneInstructions({
