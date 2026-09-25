@@ -16,7 +16,10 @@ import {
   claimStructuredAgentLaunchCancellationCleanups,
   beginStructuredAgentSessionAuthoritativeInventory
 } from './structured-agent-session-launch-cancellation'
-import { resetStructuredAgentLaunchPersistenceForTests } from './structured-agent-session-launch-persistence'
+import {
+  resetStructuredAgentLaunchPersistenceForTests,
+  structuredAgentLaunchCancellationBelongsTo
+} from './structured-agent-session-launch-persistence'
 import { refreshLocalStructuredSessionTabs } from '@/runtime/local-structured-session-tabs-sync'
 
 const WORKTREE_ID = 'repo-1::worktree-1'
@@ -171,6 +174,22 @@ describe('structured launch cancellation retirement', () => {
         expectedEnvironmentPairingRevision: 11
       })
     ).toEqual([])
+    expect(claimStructuredAgentLaunchCancellationCleanups(target)).toEqual([SESSION_ID])
+  })
+
+  it('retains the remote owner when the launch state has already been published', () => {
+    const target = {
+      kind: 'environment',
+      environmentId: 'nexbox',
+      expectedEnvironmentPairingRevision: 10
+    } as const
+    expect(markStructuredAgentSessionLaunchCancelled(WORKTREE_ID, SESSION_ID, target)).toBe(true)
+    resetStructuredAgentLaunchRegistryForTests()
+    resetStructuredAgentLaunchPersistenceForTests()
+
+    expect(structuredAgentLaunchCancellationBelongsTo(SESSION_ID, { kind: 'local' })).toBe(false)
+    expect(structuredAgentLaunchCancellationBelongsTo(SESSION_ID, target)).toBe(true)
+    expect(claimStructuredAgentLaunchCancellationCleanups()).toEqual([])
     expect(claimStructuredAgentLaunchCancellationCleanups(target)).toEqual([SESSION_ID])
   })
 

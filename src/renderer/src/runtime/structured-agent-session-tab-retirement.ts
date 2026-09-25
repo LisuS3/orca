@@ -65,7 +65,7 @@ export function beginStructuredAgentSessionTabClose(args: {
   onError?: (error: unknown) => void
 }): void {
   if (args.provisional) {
-    markStructuredAgentSessionLaunchCancelled(args.worktreeId, args.sessionId)
+    markStructuredAgentSessionLaunchCancelled(args.worktreeId, args.sessionId, args.target)
   }
   discardStructuredAgentSessionLaunchOutbox(args.sessionId)
   retireStructuredAgentSessionTab(args)

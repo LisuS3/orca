@@ -51,12 +51,14 @@ export {
   retireStructuredAgentSessionLaunchCancellationTombstone,
   shouldRetainStructuredAgentSessionLaunchTab,
   subscribeStructuredAgentLaunchStatus,
-  useStructuredAgentSessionLaunchFailureReason,
-  useStructuredAgentSessionLaunchLifecycle,
   type StructuredAgentLaunchStatus,
   type StructuredAgentSessionLaunchLifecycle
 } from './structured-agent-session-launch-registry'
-export { useStructuredAgentLaunchStatus } from './structured-agent-session-launch-status'
+export {
+  useStructuredAgentLaunchStatus,
+  useStructuredAgentSessionLaunchFailureReason,
+  useStructuredAgentSessionLaunchLifecycle
+} from './structured-agent-session-launch-status'
 export { useStructuredAgentSessionLaunchSelection } from './structured-agent-session-launch-options'
 
 type StructuredLaunchStateResult = {

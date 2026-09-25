@@ -1,5 +1,6 @@
 import { getExecutionHostIdForWorktree } from './worktree-runtime-owner'
 import type { WorktreeRuntimeOwnerState } from './worktree-runtime-owner'
+import type { ExecutionHostId } from '../../../shared/execution-host'
 import {
   runtimeTargetForExecutionHostId,
   type RuntimeClientTarget
@@ -11,7 +12,14 @@ export function structuredAgentLaunchTarget(
   state: WorktreeRuntimeOwnerState,
   worktreeId: string
 ): RuntimeClientTarget {
-  const hostId = getExecutionHostIdForWorktree(state, worktreeId)
+  return structuredAgentLaunchTargetForExecutionHostId(
+    getExecutionHostIdForWorktree(state, worktreeId)
+  )
+}
+
+export function structuredAgentLaunchTargetForExecutionHostId(
+  hostId: ExecutionHostId
+): RuntimeClientTarget {
   const target = runtimeTargetForExecutionHostId(hostId)
   if (!target) {
     throw new Error('Structured chat requires a local or paired Orca runtime.')
