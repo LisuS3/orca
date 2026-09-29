@@ -4,7 +4,6 @@ import type { AgentSessionWriteRefusal } from '../../../shared/agent-session-wri
 import {
   getStructuredAgentLaunchStatus,
   getStructuredAgentSessionLaunchFailure,
-  getStructuredAgentSessionLaunchFailureReason,
   getStructuredAgentSessionLaunchLifecycle,
   subscribeStructuredAgentLaunchStatus
 } from './structured-agent-session-launch-registry'
@@ -27,7 +26,7 @@ export function useStructuredAgentSessionLaunchFailureReason(
 ): string | null {
   return useSyncExternalStore(
     subscribeStructuredAgentLaunchStatus,
-    () => getStructuredAgentSessionLaunchFailureReason(worktreeId, sessionId),
+    () => getStructuredAgentSessionLaunchFailure(worktreeId, sessionId)?.code ?? null,
     () => null
   )
 }
